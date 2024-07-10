@@ -25,20 +25,21 @@ import HumidityIcon from "../ui/icons/HumidityIcon";
 import CludyIcon from "../ui/icons/CludyIcon";
 import WindIcon from "../ui/icons/WindIcon";
 
+// Function to convert temperature from Kelvin to Celsius
 function fahrenheitToCelsius(kelvin) {
   return Math.floor(kelvin - 273.15);
 }
 
 const Home = () => {
-  const [cityName, setCityName] = useState("");
+  const [cityName, setCityName] = useState(""); // State for storing the city name input
   const { locations, locationsPending, weatherCondition, isWeatherPending } =
-    useSelector((s) => s.weather);
-  const dispatch = useDispatch();
+    useSelector((s) => s.weather); // Extracting data from Redux store
+  const dispatch = useDispatch(); // Redux dispatch function
 
   useEffect(() => {
     if (cityName.length) {
       setTimeout(() => {
-        dispatch(getGeoLocations(cityName));
+        dispatch(getGeoLocations(cityName)); // Fetch geolocation data when cityName changes
       }, 2000);
     }
   }, [cityName]);
@@ -50,12 +51,10 @@ const Home = () => {
     };
     dispatch(getWeatherCondition(body)).then((data) => {
       if(data?.payload?.status === 200){
-        dispatch(clearCityList())
+        dispatch(clearCityList()) // Clear city list after fetching weather data
       }
     });
   };
-
-
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -65,7 +64,7 @@ const Home = () => {
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           };
-          dispatch(getWeatherCondition(body));
+          dispatch(getWeatherCondition(body)); // Fetch initial weather data when browser loads for first time
         },
         (error) => {
           console.log(error);
@@ -76,15 +75,13 @@ const Home = () => {
     }
   }, []);
 
-  console.log(locations,"locationsPending")
-
   return (
     <Wrapper>
       <WeatherRightPanel>
         <TextField
           type="text"
           placeholder="Search Cities..."
-          onChange={(e) => setCityName(e.target.value)}
+          onChange={(e) => setCityName(e.target.value)} // Update city name state
           value={cityName}
           fullWidth
         />
@@ -95,17 +92,18 @@ const Home = () => {
             {locations?.map((_data) => (
               <ListItem
                 key={_data.lat}
+                sx={{cursor:"pointer"}}
                 onClick={() => {
-                  getWeatherList(_data.lat, _data.lon);
+                  getWeatherList(_data.lat, _data.lon); // Fetch weather data for selected location
                   setCityName("");
                 }}
               >
-                coutry:{_data?.country} city:{_data?.name}
+                country: {_data?.country} city: {_data?.name}
               </ListItem>
             ))}
           </List>
         ) : cityName ? (
-          <p>Pending...</p>
+          <p>Pending...</p> // Show pending state
         ) : null}
 
         <Box className="weather_details">
@@ -141,7 +139,7 @@ const Home = () => {
                 </Stack>
               </ListItem>
               <ListItem>
-                <Typography>clouds: </Typography>
+                <Typography>Clouds: </Typography>
                 <Stack direction="row" alignItems={"center"}>
                   {weatherCondition?.clouds?.all}%
                   <i>
@@ -152,7 +150,7 @@ const Home = () => {
               <ListItem>
                 <Typography>Winds: </Typography>
                 <Stack direction="row" alignItems={"center"}>
-                  {weatherCondition?.wind?.speed}M/S
+                  {weatherCondition?.wind?.speed} M/S
                   <i>
                     <WindIcon />
                   </i>
@@ -187,7 +185,7 @@ const Home = () => {
               </Box>
               <Box className="sub_panel">
                 <Typography variant="h4">
-                  {weatherCondition?.name},{weatherCondition?.sys?.country}
+                  {weatherCondition?.name}, {weatherCondition?.sys?.country}
                 </Typography>
                 <Typography variant="h3">
                   Feels Like:{" "}
@@ -218,15 +216,12 @@ const Home = () => {
               flexWrap='wrap'
               sx={{width:'100%'}}
             >   
-              <Skeleton variant="circular" width={100} height={100} />
-            
+              <Skeleton variant="circular" width={100} height={100} /> 
               <Box sx={{width:'33.33%'}}>
-              <Skeleton variant="text" width={"100%"}  />
-              <Skeleton variant="text" width={"100%"}  />
+                <Skeleton variant="text" width={"100%"} />
+                <Skeleton variant="text" width={"100%"} />
               </Box>
-          
               <Skeleton variant="rectangular" width={50} height={50} />
-          
             </Stack>
           )}
         </Stack>
